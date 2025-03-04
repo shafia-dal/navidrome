@@ -1,0 +1,35 @@
+-docker
+check application locally
+    expose port and file URL
+    tag with proper name 
+create buildspec file
+    include commands from ECR
+    include artifacts
+
+-ECR
+create ECR
+    to store images of application
+
+-VPC
+create vpc
+security group
+    load balancer
+        allowing listners for all IP
+    ECS
+
+
+-ECS
+create task defination for ECS cluster
+create ECS cluster
+    add services
+    add tasks to service
+create load balancer
+    add healthcheck
+
+create pipeline
+    source: github
+    build: codebuild
+    deploy: codedeploy ECS
+
+-IAM
+give permission to codebuild role
