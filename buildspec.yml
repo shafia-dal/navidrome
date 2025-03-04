@@ -1,0 +1,32 @@
+version: 0.2
+
+env:
+  variables:
+    IMAGE_REPO_NAME: "navidrome-repo"
+    IMAGE_TAG: "latest"
+    AWS_REGION: "ap-south-1"
+    CLUSTER_NAME: "navidrome-cluster"
+    SERVICE_NAME: "navidrome-service"
+  # parameter-store:
+  #   LOGIN_PASSWORD: /CodeBuild/dockerLoginPassword
+
+phases:
+  pre_build:
+    commands:
+      - curl checkip.amazonaws.com
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 183295452329.dkr.ecr.ap-south-1.amazonaws.com
+      - REPO_URI=183295452329.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
+    
+  build:
+    commands:
+      - docker build -t $IMAGE_REPO_NAME .
+      - docker tag $IMAGE_REPO_NAME:latest $REPO_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - docker push $REPO_URI:$IMAGE_TAG
+      - printf '[{"name":"navidrome-container","imageUri":"%s"}]' $REPO_URI:$IMAGE_TAG > imagedefinitions.json
+      - cat imagedefinitions.json || true
+      - ls -la
+
+artifacts:
+  files: imagedefinitions.json
